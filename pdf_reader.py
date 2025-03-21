@@ -77,6 +77,6 @@ class PDFApp:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    pdf_reader = PDFReader("path_to_your_pdf.pdf")  # Replace with your PDF path
+    pdf_reader = PDFReader("pdf_files/LallePaper.pdf")  # Replace with your PDF path
     app = PDFApp(root, pdf_reader)
     root.mainloop()
