@@ -1,3 +1,4 @@
+# features.py
 def toggle_autoscroll(app):
     app.autoscroll_active = not app.autoscroll_active
     if app.autoscroll_active:
