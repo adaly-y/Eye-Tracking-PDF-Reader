@@ -72,7 +72,7 @@ class PDFApp:
                 self.update_text()  # Update text display
                 self.update_canvas()  # Update canvas with the latest image
                 self.root.update()  # Update GUI window
-                time.sleep(2)  # Wait for 0.5 seconds before highlighting the next sentence
+                time.sleep(1.2)  # Wait for 0.5 seconds before highlighting the next sentence
         except KeyboardInterrupt:
             print("\nHighlighting stopped.")
 
@@ -81,4 +81,4 @@ if __name__ == "__main__":
     pdf_reader = PDFReader("pdf_files/Introduction to Information Visualization.pdf")  # Replace with your PDF path
     app = PDFApp(root, pdf_reader)
     app.start_highlighting()  # Start highlighting the PDF content
-    root.mainloop()  # Start Tkinter GUI loop
+    root.mainloop()  # Keep the Tkinter window open after the process finishes
