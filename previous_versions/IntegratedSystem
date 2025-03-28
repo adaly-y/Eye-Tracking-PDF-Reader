@@ -1,0 +1,165 @@
+import sys
+import fitz  # PyMuPDF
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, 
+                             QLabel, QPushButton, QSlider, QFileDialog, QWidget)
+from PyQt5.QtGui import QPainter, QColor, QImage, QPen
+from PyQt5.QtCore import Qt, QTimer
+
+class PDFReaderApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+        
+        # PDF document and page attributes
+        self.document = None
+        self.current_page = None
+        self.current_page_num = 0
+        self.sentences = []
+        self.current_sentence_index = 0
+        
+        # Timers for different features
+        self.auto_scroll_timer = QTimer(self)
+        self.auto_scroll_timer.timeout.connect(self.auto_scroll)
+        
+        self.highlight_timer = QTimer(self)
+        self.highlight_timer.timeout.connect(self.highlight_next_sentence)
+        
+        self.block_text_timer = QTimer(self)
+        self.block_text_timer.timeout.connect(self.reveal_next_sentence)
+
+    def initUI(self):
+        self.setWindowTitle('Advanced PDF Reader')
+        self.setGeometry(100, 100, 1000, 800)
+        
+        # Main widget and layout
+        main_widget = QWidget()
+        main_layout = QVBoxLayout()
+        
+        # PDF Display Area
+        self.pdf_label = QLabel('Open a PDF to begin')
+        self.pdf_label.setAlignment(Qt.AlignCenter)
+        main_layout.addWidget(self.pdf_label)
+        
+        # Control Buttons Layout
+        control_layout = QHBoxLayout()
+        
+        # Open PDF Button
+        open_btn = QPushButton('Open PDF')
+        open_btn.clicked.connect(self.open_pdf)
+        control_layout.addWidget(open_btn)
+        
+        # Auto Scroll Speed Slider
+        self.scroll_speed_slider = QSlider(Qt.Horizontal)
+        self.scroll_speed_slider.setMinimum(1)
+        self.scroll_speed_slider.setMaximum(10)
+        self.scroll_speed_slider.setValue(5)
+        self.scroll_speed_slider.setTickPosition(QSlider.TicksBelow)
+        self.scroll_speed_slider.setTickInterval(1)
+        control_layout.addWidget(QLabel('Scroll Speed:'))
+        control_layout.addWidget(self.scroll_speed_slider)
+        
+        # Feature Buttons
+        feature_layout = QHBoxLayout()
+        
+        auto_scroll_btn = QPushButton('Auto Scroll')
+        auto_scroll_btn.clicked.connect(self.start_auto_scroll)
+        feature_layout.addWidget(auto_scroll_btn)
+        
+        highlight_btn = QPushButton('Highlight Sentences')
+        highlight_btn.clicked.connect(self.start_sentence_highlight)
+        feature_layout.addWidget(highlight_btn)
+        
+        block_text_btn = QPushButton('Block Text')
+        block_text_btn.clicked.connect(self.start_block_text)
+        feature_layout.addWidget(block_text_btn)
+        
+        # Add layouts to main layout
+        main_layout.addLayout(control_layout)
+        main_layout.addLayout(feature_layout)
+        
+        main_widget.setLayout(main_layout)
+        self.setCentralWidget(main_widget)
+
+    def open_pdf(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, 'Open PDF', '', 'PDF Files (*.pdf)')
+        if file_path:
+            self.document = fitz.open(file_path)
+            self.current_page_num = 0
+            self.current_page = self.document[self.current_page_num]
+            self.display_page()
+            self.extract_sentences()
+
+    def display_page(self):
+        # Convert PDF page to QImage for display
+        pix = self.current_page.get_pixmap()
+        img = QImage(pix.samples, pix.width, pix.height, pix.stride, QImage.Format_RGB888)
+        self.pdf_label.setPixmap(img.scaled(self.pdf_label.size(), 
+                                            Qt.KeepAspectRatio, 
+                                            Qt.SmoothTransformation))
+
+    def extract_sentences(self):
+        # Basic sentence extraction (can be improved)
+        text = self.current_page.get_text()
+        self.sentences = [s.strip() for s in text.split('.') if s.strip()]
+
+    def start_auto_scroll(self):
+        # Reset timers and other features
+        self.stop_all_features()
+        
+        # Start auto-scrolling based on slider value
+        speed = 11 - self.scroll_speed_slider.value()  # Invert slider for intuitive control
+        self.auto_scroll_timer.start(speed * 100)  # Milliseconds between scrolls
+
+    def auto_scroll(self):
+        # Simple vertical scroll simulation
+        current_scroll = self.pdf_label.y()
+        self.pdf_label.move(self.pdf_label.x(), current_scroll - 10)
+
+    def start_sentence_highlight(self):
+        # Reset all features
+        self.stop_all_features()
+        
+        # Reset sentence index and start highlighting
+        self.current_sentence_index = 0
+        self.highlight_timer.start(500)  # 0.5-second delay
+
+    def highlight_next_sentence(self):
+        if self.current_sentence_index < len(self.sentences):
+            # Highlight current sentence (placeholder - actual implementation would require 
+            # more complex PDF text rendering)
+            print(f"Highlighting: {self.sentences[self.current_sentence_index]}")
+            self.current_sentence_index += 1
+        else:
+            self.highlight_timer.stop()
+
+    def start_block_text(self):
+        # Reset all features
+        self.stop_all_features()
+        
+        # Reset sentence index and start blocking
+        self.current_sentence_index = 0
+        self.block_text_timer.start(1000)  # 1-second delay
+
+    def reveal_next_sentence(self):
+        if self.current_sentence_index < len(self.sentences):
+            # Reveal next sentence (placeholder - actual implementation would require 
+            # complex PDF text rendering and masking)
+            print(f"Revealing: {self.sentences[self.current_sentence_index]}")
+            self.current_sentence_index += 1
+        else:
+            self.block_text_timer.stop()
+
+    def stop_all_features(self):
+        # Stop all timers
+        self.auto_scroll_timer.stop()
+        self.highlight_timer.stop()
+        self.block_text_timer.stop()
+
+def main():
+    app = QApplication(sys.argv)
+    pdf_reader = PDFReaderApp()
+    pdf_reader.show()
+    sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    main()

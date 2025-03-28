@@ -1,0 +1,22 @@
+PyMuPDF==1.22.3
+PyQt5==5.15.7
+Pillow==9.5.0
+tkinter
+```
+
+Note: 
+- The version numbers are suggestions based on compatibility as of 2024
+- Tkinter typically comes pre-installed with Python, so you might not need to install it separately
+- Ensure you're using Python 3.7 or higher
+
+Create a virtual environment (recommended)
+python -m venv pdf_tools_env
+
+# Activate the virtual environment
+# On Windows:
+pdf_tools_env\Scripts\activate
+# On macOS/Linux:
+source pdf_tools_env/bin/activate
+
+# Install dependencies
+pip install PyMuPDF PyQt5 Pillow tkinter
