@@ -2,7 +2,7 @@ import sys
 import fitz  # PyMuPDF
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QLabel, 
                              QPushButton, QFileDialog, QWidget, QMessageBox, 
-                             QHBoxLayout, QSpinBox, QSlider, QTextEdit)
+                             QHBoxLayout, QSpinBox, QTextEdit, QDoubleSpinBox)
 from PyQt5.QtGui import QImage, QPixmap, QPainter, QColor
 from PyQt5.QtCore import Qt, QTimer
 
@@ -55,16 +55,16 @@ class BlockingPDFReader(QMainWindow):
         self.lines_selector.setPrefix('Reveal Lines: ')
         line_reveal_layout.addWidget(self.lines_selector)
         
-        # Speed Control Slider
-        self.speed_label = QLabel('Speed: Slow')
-        line_reveal_layout.addWidget(self.speed_label)
+        # Delay input field (replacing the slider)
+        delay_label = QLabel('Delay (seconds):')
+        line_reveal_layout.addWidget(delay_label)
         
-        self.speed_slider = QSlider(Qt.Horizontal)
-        self.speed_slider.setMinimum(1000)  # 1 second
-        self.speed_slider.setMaximum(5000)  # 5 seconds
-        self.speed_slider.setValue(2000)  # Default to 2 seconds
-        self.speed_slider.valueChanged.connect(self.update_speed_label)
-        line_reveal_layout.addWidget(self.speed_slider)
+        self.delay_input = QDoubleSpinBox()
+        self.delay_input.setDecimals(1)  # Allow one decimal place
+        self.delay_input.setRange(0.1, 10.0)  # Allow 0.1 to 10 seconds
+        self.delay_input.setValue(3.9)  # Default to 3.9 seconds
+        self.delay_input.setSingleStep(0.1)  # Step by 0.1 seconds
+        line_reveal_layout.addWidget(self.delay_input)
         
         controls_layout.addLayout(line_reveal_layout)
         
@@ -101,22 +101,6 @@ class BlockingPDFReader(QMainWindow):
         # Stop the timer if it's running
         if self.block_text_timer.isActive():
             self.block_text_timer.stop()
-
-    def update_speed_label(self):
-        # Update speed label based on slider value
-        speed_value = self.speed_slider.value()
-        if speed_value <= 1500:
-            label_text = 'Speed: Very Slow'
-        elif speed_value <= 2500:
-            label_text = 'Speed: Slow'
-        elif speed_value <= 3500:
-            label_text = 'Speed: Medium'
-        elif speed_value <= 4500:
-            label_text = 'Speed: Fast'
-        else:
-            label_text = 'Speed: Very Fast'
-        
-        self.speed_label.setText(label_text)
 
     def open_pdf(self):
         try:
@@ -179,8 +163,10 @@ class BlockingPDFReader(QMainWindow):
         if self.current_line_index >= len(self.lines):
             self.current_line_index = 0
         
-        # Set timer interval based on slider value
-        timer_interval = self.speed_slider.value()
+        # Convert seconds to milliseconds for timer
+        delay_seconds = self.delay_input.value()
+        timer_interval = int(delay_seconds * 1000)
+        
         self.block_text_timer.start(timer_interval)
 
     def reveal_next_lines(self):
