@@ -61,7 +61,7 @@ class BlockingPDFReader(QMainWindow):
         
         self.delay_input = QDoubleSpinBox()
         self.delay_input.setDecimals(1)  # Allow one decimal place
-        self.delay_input.setRange(0.1, 10.0)  # Allow 0.1 to 10 seconds
+        self.delay_input.setRange(0.1, 20.0)  # Allow 0.1 to 10 seconds
         self.delay_input.setValue(3.9)  # Default to 3.9 seconds
         self.delay_input.setSingleStep(0.1)  # Step by 0.1 seconds
         line_reveal_layout.addWidget(self.delay_input)
