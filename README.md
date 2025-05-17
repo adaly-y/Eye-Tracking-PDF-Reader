@@ -1,4 +1,4 @@
-# PDF-Reader: A COGS 303 Pilot Project
+# Eye Tracking PDF-Reader: A COGS 303 Pilot Project
 This project is a Python-based PDF reader designed to help users focus on reading dense text by implementing adaptive features. Since our team does not have access to actual eye-tracking devices, this will serve as the simulation of a pilot user study to determine user needs. 
 
 The key features of this demonstration will include:
